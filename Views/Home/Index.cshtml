@@ -1,0 +1,128 @@
+﻿@using health.Models;
+@using health.Extensions;
+@model MonitoringServices
+
+@{
+    ViewData["Title"] = "Мониторинг активности web сервиса";
+    int evaluationTime = ViewBag.EvaluationTimeOnSeconds;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <span>Состояние активности web сервиса на текущий момент</span>
+    <table class="table table-bordered table-striped table-striped table-sm">
+        <thead>
+            <tr>
+                <td>Наименование</td>
+                <td>Статус</td>
+                <td>Время обработки запроса (мс)</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in Model.CurrentHealth.Entries)
+            {
+            <tr class="@Html.GetCssClassHealthStatus(entry.Value.Status)">
+                <td>@entry.Key</td>
+                <td>@Html.GetNameHealthStatus(entry.Value.Status)</td>
+                <td>@entry.Value.Duration.TotalMilliseconds</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    <span>Состояние активности web сервиса за текущий час</span>
+    <table class="table table-bordered table-striped table-sm">
+        <thead>
+            <tr>
+                <td>Наименование</td>
+                <td>Кол-во отклонений</td>
+                <td>Время обработки запроса (мс)</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in Model.LastHourHealth)
+            {
+                <tr data-toggle="collapse" data-target="#hour_@(entry.Name)" class="@Html.GetCssDuration(evaluationTime, entry.MaxDuration) accordion-toggle">
+                    <td>@entry.Name</td>
+                    <td>@entry.Total</td>
+                    <td>@entry.MaxDuration.TotalMilliseconds</td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" class="hiddenRow">
+                        <div class="accordian-body collapse" id="hour_@(entry.Name)">
+                            <table class="table table-bordered table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <td>Дата запроса</td>
+                                        <td>Время обработки запроса (мс)</td>
+                                        <td>Статус</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var historyEntry in entry.Data)
+                                    {
+                                    <tr class="@Html.GetCssClassHealthStatus(historyEntry.Status)">
+                                        <td>@historyEntry.DateTime</td>
+                                        <td>@historyEntry.Duration.TotalMilliseconds</td>
+                                        <td>@Html.GetNameHealthStatus(historyEntry.Status)</td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <span>Состояние активности web сервиса за день</span>
+    <table class="table table-bordered table-striped table-sm">
+        <thead>
+            <tr>
+                <td>Наименование</td>
+                <td>Кол-во отклонений</td>
+                <td>Время обработки запроса (мс)</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in Model.LastDayHealth)
+            {
+                <tr data-toggle="collapse" data-target="#day_@(entry.Name)" class="@Html.GetCssDuration(evaluationTime, entry.MaxDuration) accordion-toggle">
+                    <td>@entry.Name</td>
+                    <td>@entry.Total</td>
+                    <td>@entry.MaxDuration.TotalMilliseconds</td>
+                </tr>
+
+                <tr>
+                    <td colspan="6" class="hiddenRow">
+                        <div class="accordian-body collapse" id="day_@(entry.Name)">
+                            <table class="table table-bordered table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <td>Дата запроса</td>
+                                        <td>Время обработки запроса (мс)</td>
+                                        <td>Статус</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var historyEntry in entry.Data)
+                                    {
+                                       
+                                        <tr class="@Html.GetCssClassHealthStatus(historyEntry.Status)">
+                                            <td>@historyEntry.DateTime</td>
+                                            <td>@historyEntry.Duration.TotalMilliseconds</td>
+                                            <td>@Html.GetNameHealthStatus(historyEntry.Status)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</p>
